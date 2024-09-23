@@ -18,14 +18,14 @@ jobs:
     needs: checkout
     steps:
       - name: Cache SonarQube packages
-        uses: actions/cache@v1
+        uses: actions/cache@v4.0.2
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
       
       - name: Cache Maven packages
-        uses: actions/cache@v1
+        uses: actions/cache@v4.0.2
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -51,7 +51,7 @@ jobs:
           echo "branches = ${{ steps.jacoco.outputs.branches }}"
 
       - name: Upload JaCoCo coverage report as a workflow artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: jacoco-report
           path: target/site/jacoco/
@@ -61,9 +61,9 @@ jobs:
     needs: jacoco
     steps:
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4.3.0
         with:
-          java-version: 17
+          java-version: 11
       
       - name: Install Maven
         run: |
@@ -86,7 +86,7 @@ jobs:
     needs: sonarqube
     steps:
       - name: Upload jar to folder
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: my-artifact
           path: target/
@@ -96,10 +96,10 @@ jobs:
     needs: artifacts
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Download web-app content
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.1.8
         with:
           name: my-artifact
           path: target/
