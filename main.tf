@@ -1,20 +1,18 @@
 provider "google" {
-  project = "stalwartl-1667731023284" 
-  region  = "us-east1"
-  zone    = "us-east1-b"
+  project = "stalwartl-1667731023284"  
+  region  = "us-east1"               
 }
 
-resource "google_compute_instance" "vm_instance" {
-  name         = "terraform-instance"
-  machine_type = "f1-micro"
+resource "google_container_cluster" "primary" {
+  name     = "gke-cluster"    
+  location = "us-east1-b"             
 
-  boot_disk {
-    initialize_params {
-      image = "debian-cloud/debian-11"
-    }
-  }
+  initial_node_count = 3                
 
-  network_interface {
-    network = "default"
+  node_config {
+    machine_type = "e2-medium"          
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform",  
+    ]
   }
 }
