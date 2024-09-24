@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-cluster:
+  setup-gcp:
     runs-on: ubuntu-latest
     # if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
@@ -28,3 +28,16 @@ jobs:
 
       - name: Set GCP Project
         run: gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+
+  cluster:
+    needs: setup-gcp
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+      
