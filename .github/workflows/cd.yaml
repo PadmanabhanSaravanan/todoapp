@@ -13,25 +13,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          version: '403.0.0'
-
-      - name: Authenticate to GCP
-        env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
-        run: echo "${GCP_SA_KEY}" | gcloud auth activate-service-account --key-file=-
-
-      - name: Set GCP Project
-        run: gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
-
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          install_components: kubectl
           
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
