@@ -14,5 +14,6 @@ resource "google_container_cluster" "primary" {
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform",  
     ]
+    service_account = "githubactions@stalwartl-1667731032306.iam.gserviceaccount.com"
   }
 }
