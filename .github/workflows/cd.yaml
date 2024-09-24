@@ -13,14 +13,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-          
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
         run: terraform init
         env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }} 
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
       - name: Terraform Plan
         run: terraform plan -input=false
@@ -31,6 +31,44 @@ jobs:
         run: terraform apply -auto-approve -input=false
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          
+      - name: Fetch GKE Cluster Credentials
+        run: |
+          gcloud container clusters get-credentials gke-cluster --region us-east1-b --project stalwartl-1667731032306
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: ${{ secrets.GCP_SA_KEY }}
+
+  deploy-application:
+    runs-on: ubuntu-latest
+    needs: setup-gcp
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        run: |
+          sudo apt-get update && sudo apt-get install -y kubectl
+
+      - name: Apply Kubernetes Deployment
+        run: kubectl apply -f deployment.yaml
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: deploy-application
+    steps:
+      - name: Run Integration Tests
+        run: |
+          newman run postman_collection.json
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: integration-test
+    steps:
+      - name: Cleanup Kubernetes Deployment
+        run: kubectl delete -f deployment.yaml
 
       - name: Terraform Destroy
         run: terraform destroy -auto-approve -input=false
