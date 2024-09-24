@@ -16,4 +16,5 @@ resource "google_container_cluster" "primary" {
     ]
     service_account = "githubactions@stalwartl-1667731032306.iam.gserviceaccount.com"
   }
+deletion_protection = false  # Set this to false to allow deletion
 }
