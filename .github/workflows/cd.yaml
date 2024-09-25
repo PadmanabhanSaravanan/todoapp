@@ -72,17 +72,7 @@ jobs:
       #   run: kubectl delete -f deployment.yaml
 
       - name: Destroy GKE cluster and resources
-        run: |
-          # Revoke any existing gcloud auth to avoid conflicts
-          gcloud auth revoke --all
-
-          # Authenticate using the service account key
-          echo "${{ secrets.GCP_SA_KEY }}" > "${HOME}/gcp-key.json"
-          gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
-          export GOOGLE_APPLICATION_CREDENTIALS="${HOME}/gcp-key.json"
-          
-          # Run terraform destroy
-          terraform destroy -auto-approve -input=false
+        run: terraform destroy -auto-approve -input=false
         env:
           GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }}
           TF_VAR_project_id: ${{ env.PROJECT_ID }}
