@@ -64,6 +64,8 @@ jobs:
   deploy-to-cluster:
     runs-on: ubuntu-latest
     needs: create-cluster
+    outputs:
+      baseurl: ${{ steps.extract-url.outputs.baseurl }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -85,9 +87,32 @@ jobs:
       - name: Deploy application to GKE
         run: kubectl apply -f deployment.yaml
 
-  destroy-cluster:
+      - name: Extract baseurl from GKE service
+        id: extract-url
+        run: |
+          EXTERNAL_IP=$(kubectl get svc svctodoh2api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          PORT=$(kubectl get svc svctodoh2api -o jsonpath='{.spec.ports[0].port}')
+          echo "baseurl=http://$EXTERNAL_IP:$PORT" >> $GITHUB_OUTPUT
+
+  run-postman-tests:
     runs-on: ubuntu-latest
     needs: deploy-to-cluster
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman Collection
+        env:
+          BASEURL: ${{ needs.deploy-to-cluster.outputs.baseurl }}
+        run: |
+          newman run your-postman-collection.json --env-var "baseUrl=${{ env.BASEURL }}"
+          
+  destroy-cluster:
+    runs-on: ubuntu-latest
+    needs: [deploy-to-cluster, run-postman-tests]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
