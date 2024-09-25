@@ -1,10 +1,3 @@
-terraform {
-  backend "gcs" {
-    bucket  = "terrafom-state-bucket"  # Replace with your bucket name
-    prefix  = "terraform/gke-cluster"        # This is the directory within the bucket
-  }
-}
-
 provider "google" {
   project = var.project_id
   region  = var.region
