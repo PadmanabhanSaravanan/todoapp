@@ -77,13 +77,18 @@ jobs:
 
   destroy-resources:
     runs-on: ubuntu-latest
-    # needs: deploy-application
+    # needs: deploy-application-cluster
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init  # Add this step to reinitialize dependencies
+        run: terraform init
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
       - name: Terraform Destroy
         run: terraform destroy -auto-approve -input=false
