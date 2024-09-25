@@ -50,7 +50,7 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v2'
 
       - name: 'Use gcloud CLI'
-        run: 'gcloud info'
+        run: 'gcloud container clusters get-credentials gke-cluster --zone us-east1-b --project stalwartl-1667731032306'
 
       # - name: Deploy application to GKE
       #   run: kubectl apply -f deployment.yaml
