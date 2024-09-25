@@ -42,12 +42,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8081/api/v1/todos",
-					"protocol": "http",
+					"raw": "({baseUrl}/api/v1/todos",
 					"host": [
-						"localhost"
+						"({baseUrl}"
 					],
-					"port": "8081",
 					"path": [
 						"api",
 						"v1",
