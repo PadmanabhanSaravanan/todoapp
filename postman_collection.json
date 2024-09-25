@@ -21,9 +21,9 @@
 					}
 				},
 				"url": {
-					"raw": "({baseUrl})/api/v1/todos",
+					"raw": "{{base_url}}/api/v1/todos",
 					"host": [
-						"({baseUrl})"
+						"{{base_url}}"
 					],
 					"path": [
 						"api",
@@ -40,9 +40,9 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "({baseUrl}/api/v1/todos",
+					"raw": "{{base_url}}/api/v1/todos",
 					"host": [
-						"({baseUrl}"
+						"{{base_url}}"
 					],
 					"path": [
 						"api",
