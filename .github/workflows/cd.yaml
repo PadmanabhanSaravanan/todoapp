@@ -108,7 +108,7 @@ jobs:
         env:
           BASEURL: ${{ needs.deploy-to-cluster.outputs.baseurl }}
         run: |
-          newman run your-postman-collection.json --env-var "base_url=${{ env.BASEURL }}"
+          newman run postman_collection.json --env-var "base_url=${{ env.BASEURL }}"
           
   destroy-cluster:
     runs-on: ubuntu-latest
