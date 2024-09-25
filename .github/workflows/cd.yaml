@@ -8,58 +8,52 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup-gcp:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  # setup-gcp:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
           
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v1
 
-      - name: Terraform Init
-        run: terraform init
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }} 
+  #     - name: Terraform Init
+  #       run: terraform init
+  #       env:
+  #         GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }} 
 
-      - name: Terraform Plan
-        run: terraform plan -input=false
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+  #     - name: Terraform Plan
+  #       run: terraform plan -input=false
+  #       env:
+  #         GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Terraform Apply
-        id: terraform-apply
-        run: terraform apply -auto-approve -input=false
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+  #     - name: Terraform Apply
+  #       id: terraform-apply
+  #       run: terraform apply -auto-approve -input=false
+  #       env:
+  #         GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
   deploy-application:
     runs-on: ubuntu-latest
-    needs: setup-gcp
-    if: success()
+    # needs: setup-gcp
+    # if: success()
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+        uses: 'google-github-actions/auth@v2'
         with:
-          project_id: stalwartl-1667731032306
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Setup kubectl
-        run: |
-          sudo apt-get install -y apt-transport-https ca-certificates curl
-          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
 
-      - name: Get GKE credentials
-        run: gcloud container clusters get-credentials gke-cluster --region us-east1-b --project stalwartl-1667731032306
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
 
-      - name: Deploy application to GKE
-        run: kubectl apply -f deployment.yaml
+      # - name: Deploy application to GKE
+      #   run: kubectl apply -f deployment.yaml
 
   # destroy-resources:
   #   runs-on: ubuntu-latest
