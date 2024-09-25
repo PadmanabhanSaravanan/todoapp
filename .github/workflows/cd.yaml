@@ -16,68 +16,68 @@ env:
   SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
 jobs:
-  create-cluster:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  # create-cluster:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
           
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v1
 
-      - name: Terraform Init
-        run: terraform init
-        env:
-          GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }} 
+  #     - name: Terraform Init
+  #       run: terraform init
+  #       env:
+  #         GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }} 
 
-      - name: Terraform Plan
-        run: terraform plan -input=false
-        env:
-          GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }}
-          TF_VAR_project_id: ${{ env.PROJECT_ID }}
-          TF_VAR_region: ${{ env.GKE_REGION }}
-          TF_VAR_location: ${{ env.GKE_LOCATION }}
-          TF_VAR_cluster_name: ${{ env.GKE_CLUSTER }}
-          TF_VAR_service_account: ${{ env.SERVICE_ACCOUNT }}
+  #     - name: Terraform Plan
+  #       run: terraform plan -input=false
+  #       env:
+  #         GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }}
+  #         TF_VAR_project_id: ${{ env.PROJECT_ID }}
+  #         TF_VAR_region: ${{ env.GKE_REGION }}
+  #         TF_VAR_location: ${{ env.GKE_LOCATION }}
+  #         TF_VAR_cluster_name: ${{ env.GKE_CLUSTER }}
+  #         TF_VAR_service_account: ${{ env.SERVICE_ACCOUNT }}
 
-      - name: Terraform Apply
-        id: terraform-apply
-        run: terraform apply -auto-approve -input=false
-        env:
-          GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }}
-          TF_VAR_project_id: ${{ env.PROJECT_ID }}
-          TF_VAR_region: ${{ env.GKE_REGION }}
-          TF_VAR_location: ${{ env.GKE_LOCATION }}
-          TF_VAR_cluster_name: ${{ env.GKE_CLUSTER }}
-          TF_VAR_service_account: ${{ env.SERVICE_ACCOUNT }}
+  #     - name: Terraform Apply
+  #       id: terraform-apply
+  #       run: terraform apply -auto-approve -input=false
+  #       env:
+  #         GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }}
+  #         TF_VAR_project_id: ${{ env.PROJECT_ID }}
+  #         TF_VAR_region: ${{ env.GKE_REGION }}
+  #         TF_VAR_location: ${{ env.GKE_LOCATION }}
+  #         TF_VAR_cluster_name: ${{ env.GKE_CLUSTER }}
+  #         TF_VAR_service_account: ${{ env.SERVICE_ACCOUNT }}
 
-  deploy-application-cluster:
-    runs-on: ubuntu-latest
-    needs: create-cluster
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  # deploy-application-cluster:
+  #   runs-on: ubuntu-latest
+  #   needs: create-cluster
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Install Google Cloud SDK
-        uses: 'google-github-actions/auth@v2'
-        with:
-          credentials_json: ${{ env.CREDENTIALS }}
+  #     - name: Install Google Cloud SDK
+  #       uses: 'google-github-actions/auth@v2'
+  #       with:
+  #         credentials_json: ${{ env.CREDENTIALS }}
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
+  #     - name: 'Set up Cloud SDK'
+  #       uses: 'google-github-actions/setup-gcloud@v2'
 
-      - name: 'Configure kubectl to use gke-gcloud-auth-plugin'
-        run: gcloud components install kubectl
+  #     - name: 'Configure kubectl to use gke-gcloud-auth-plugin'
+  #       run: gcloud components install kubectl
 
-      - name: Get GKE credentials
-        run: gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_LOCATION }} --project ${{ secrets.GCP_PROJECT_ID }}
+  #     - name: Get GKE credentials
+  #       run: gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_LOCATION }} --project ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Deploy application to GKE
-        run: kubectl apply -f deployment.yaml
+  #     - name: Deploy application to GKE
+  #       run: kubectl apply -f deployment.yaml
 
   destroy-resources:
     runs-on: ubuntu-latest
-    needs: deploy-application-cluster
+    # needs: deploy-application
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -89,3 +89,8 @@ jobs:
         run: terraform destroy -auto-approve -input=false
         env:
           GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }}
+          TF_VAR_project_id: ${{ env.PROJECT_ID }}
+          TF_VAR_region: ${{ env.GKE_REGION }}
+          TF_VAR_location: ${{ env.GKE_LOCATION }}
+          TF_VAR_cluster_name: ${{ env.GKE_CLUSTER }}
+          TF_VAR_service_account: ${{ env.SERVICE_ACCOUNT }}
