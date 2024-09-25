@@ -63,10 +63,10 @@ jobs:
         with:
           credentials_json: ${{ env.CREDENTIALS }}
 
-      - name: 'Set up Cloud SDK'
+      - name: Set up Cloud SDK
         uses: 'google-github-actions/setup-gcloud@v2'
 
-      - name: 'Configure kubectl to use gke-gcloud-auth-plugin'
+      - name: Configure kubectl to use gke-gcloud-auth-plugin
         run: gcloud components install kubectl
 
       - name: Get GKE credentials
@@ -75,9 +75,13 @@ jobs:
       - name: Deploy application to GKE
         run: kubectl apply -f deployment.yaml
 
-      - name: Get External IP and Port
+      - name: Wait for External IP and Port
         id: get_ip_port
         run: |
+          echo "Waiting for service to get external IP..."
+          until [ "$(kubectl get svc todo-app-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" != "" ]; do
+            sleep 10
+          done
           NODE_EXTERNAL_IP=$(kubectl get svc todo-app-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
           NODE_PORT=$(kubectl get svc todo-app-service -o jsonpath='{.spec.ports[0].nodePort}')
           echo "NODE_EXTERNAL_IP=$NODE_EXTERNAL_IP" >> $GITHUB_ENV
@@ -93,6 +97,11 @@ jobs:
       - name: Install Newman
         run: |
           npm install -g newman
+
+      - name: Debug Environment Variables
+        run: |
+          echo "NODE_EXTERNAL_IP=${{ env.NODE_EXTERNAL_IP }}"
+          echo "NODE_PORT=${{ env.NODE_PORT }}"
 
       - name: Run Postman Collection
         run: |
