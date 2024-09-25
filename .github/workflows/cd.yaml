@@ -5,8 +5,7 @@ on:
     workflows: ["Continuous Integration"]
     types:
       - completed
-  workflow_dispatch:
-
+      
 env:
   CREDENTIALS: ${{ secrets.GCP_SA_KEY }} 
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
