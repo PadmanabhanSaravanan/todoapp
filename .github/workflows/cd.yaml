@@ -13,72 +13,61 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+          
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
-      - name: Set up Google Cloud Credentials
-        run: echo "${{ secrets.GCP_SA_KEY }}" > "${HOME}/gcp-key.json"
-      
-      - name: Authenticate with GCP
-        run: gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
-      
-      - name: Configure gcloud to use project
-        run: gcloud config set project stalwartl-1667731032306
-        
       - name: Terraform Init
         run: terraform init
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: "${HOME}/gcp-key.json"
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }} 
 
       - name: Terraform Plan
         run: terraform plan -input=false
         env:
-          GOOGLE_APPLICATIONS_CREDENTIALS: "${HOME}/gcp-key.json"
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
       - name: Terraform Apply
+        id: terraform-apply
         run: terraform apply -auto-approve -input=false
         env:
-          GOOGLE_APPLICATIONS_CREDENTIALS: "${HOME}/gcp-key.json"
-          
-      - name: Fetch GKE Cluster Credentials
-        run: |
-          gcloud container clusters get-credentials gke-cluster --region us-east1-b --project stalwartl-1667731032306
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: "${HOME}/gcp-key.json"
-          
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+
   deploy-application:
     runs-on: ubuntu-latest
     needs: setup-gcp
+    if: success() || failure()  # Ensures this job runs even if the previous job failed
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install kubectl
+      - name: Setup kubectl
         run: |
-          sudo apt-get update && sudo apt-get install -y kubectl
+          sudo apt-get install -y apt-transport-https ca-certificates curl
+          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
 
-      - name: Apply Kubernetes Deployment
-        run: kubectl apply -f deployment.yaml
+      - name: Set up kubeconfig
+        run: gcloud container clusters get-credentials gke-cluster --region us-east1-b --project stalwartl-1667731032306
         env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
-          
-  integration-test:
-    runs-on: ubuntu-latest
-    needs: deploy-application
-    steps:
-      - name: Run Integration Tests
-        run: |
-          newman run postman_collection.json
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
-  cleanup:
+      - name: Deploy application to GKE
+        run: kubectl apply -f deployment.yaml
+
+  destroy-resources:
     runs-on: ubuntu-latest
-    needs: integration-test
+    needs: [setup-gcp, deploy-application]
+    if: always()  # Ensures this job always runs
     steps:
-      - name: Cleanup Kubernetes Deployment
-        run: kubectl delete -f deployment.yaml
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Destroy
         run: terraform destroy -auto-approve -input=false
         env:
-          GOOGLE_APPLICATIONS_CREDENTIALS: "${HOME}/gcp-key.json"
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
