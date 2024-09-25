@@ -72,7 +72,7 @@ jobs:
         id: get_ip_port
         run: |
           echo "Waiting for service to get external IP..."
-          until [ "$(kubectl get svc todo-app-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" != "" ]; do
+          until [ "$(kubectl get svc svctodoh2api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" != "" ]; do
             sleep 10
           done
           NODE_EXTERNAL_IP=$(kubectl get svc svctodoh2api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
