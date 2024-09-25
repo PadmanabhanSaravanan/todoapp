@@ -16,7 +16,7 @@ env:
   SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
 jobs:
-  continuous_deployment:
+  create-cluster:
     runs-on: ubuntu-latest  
     steps:
       - name: Checkout repository
@@ -51,7 +51,7 @@ jobs:
           TF_VAR_cluster_name: ${{ env.GKE_CLUSTER }}
           TF_VAR_service_account: ${{ env.SERVICE_ACCOUNT }}
 
-  deploy-application-cluster:
+  deploy-to-cluster:
     runs-on: ubuntu-latest
     needs: create-cluster
     steps:
