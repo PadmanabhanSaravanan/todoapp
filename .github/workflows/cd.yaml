@@ -25,10 +25,10 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
-      # - name: Terraform Init
-      #   run: terraform init
-      #   env:
-      #     GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }} 
+      - name: Terraform Init
+        run: terraform init
+        env:
+          GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }} 
 
       # - name: Terraform Plan
       #   run: terraform plan -input=false
