@@ -51,30 +51,37 @@ jobs:
       #     TF_VAR_cluster_name: ${{ env.GKE_CLUSTER }}
       #     TF_VAR_service_account: ${{ env.SERVICE_ACCOUNT }}
 
-      - name: Install Google Cloud SDK
-        uses: 'google-github-actions/auth@v2'
-        with:
-          credentials_json: ${{ env.CREDENTIALS }}
+      # - name: Install Google Cloud SDK
+      #   uses: 'google-github-actions/auth@v2'
+      #   with:
+      #     credentials_json: ${{ env.CREDENTIALS }}
 
-      - name: Set up Cloud SDK
-        uses: 'google-github-actions/setup-gcloud@v2'
+      # - name: Set up Cloud SDK
+      #   uses: 'google-github-actions/setup-gcloud@v2'
 
-      - name: Configure kubectl to use gke-gcloud-auth-plugin
-        run: gcloud components install kubectl
+      # - name: Configure kubectl to use gke-gcloud-auth-plugin
+      #   run: gcloud components install kubectl
 
-      - name: Get GKE credentials
-        run: gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_LOCATION }} --project ${{ secrets.GCP_PROJECT_ID }}
+      # - name: Get GKE credentials
+      #   run: gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_LOCATION }} --project ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Deploy application to GKE
-        run: kubectl apply -f deployment.yaml
+      # - name: Deploy application to GKE
+      #   run: kubectl apply -f deployment.yaml
 
-      - name: Destroy deployment from GKE
-        run: kubectl delete -f deployment.yaml
+      # - name: Destroy deployment from GKE
+      #   run: kubectl delete -f deployment.yaml
 
-      - name: Terraform Destroy
+      - name: Destroy GKE cluster and resources
         run: |
-          gcloud auth revoke --all  # Revoke gcloud authentication
-          export GOOGLE_APPLICATION_CREDENTIALS=${{ env.CREDENTIALS }}  # Use credentials directly for Terraform
+          # Revoke any existing gcloud auth to avoid conflicts
+          gcloud auth revoke --all
+
+          # Authenticate using the service account key
+          echo "${{ secrets.GCP_SA_KEY }}" > "${HOME}/gcp-key.json"
+          gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="${HOME}/gcp-key.json"
+          
+          # Run terraform destroy
           terraform destroy -auto-approve -input=false
         env:
           GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }}
