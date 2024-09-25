@@ -29,5 +29,6 @@ spec:
   selector:
     app: todo
   ports:
-  - port: 80
-    targetPort: 80
+    - port: 80
+      targetPort: 80
+  type: LoadBalancer  # This line allows the service to have an external IP
