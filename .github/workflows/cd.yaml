@@ -72,7 +72,7 @@ jobs:
       #   run: kubectl delete -f deployment.yaml
 
       - name: Destroy GKE cluster and resources
-        run: terraform destroy -auto-approve -input=false
+        run: terraform apply -destroy -auto-approve -input=false
         env:
           GOOGLE_CREDENTIALS: ${{ env.CREDENTIALS }}
           TF_VAR_project_id: ${{ env.PROJECT_ID }}
