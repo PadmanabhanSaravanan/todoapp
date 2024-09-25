@@ -1,4 +1,4 @@
-ame: 24-02-Concurrency
+name: 24-02-Concurrency
 
 on:
   workflow_dispatch:
