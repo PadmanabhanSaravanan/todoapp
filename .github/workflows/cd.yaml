@@ -27,7 +27,7 @@ jobs:
           project_id: ${{ env.PROJECT_ID }}
           
       - run: |
-          gcloud storage buckets create terraform-state-bucket
+          gcloud storage buckets create gs://terraform-state-bucket
 
   create-cluster:
     runs-on: ubuntu-latest 
