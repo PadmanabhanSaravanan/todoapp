@@ -1,6 +1,13 @@
+terraform {
+  backend "gcs" {
+    bucket  = "terrafom-state-bucket"  # Replace with your bucket name
+    prefix  = "terraform/gke-cluster"        # This is the directory within the bucket
+  }
+}
+
 provider "google" {
-  project = var.project_id 
-  region  = var.region  
+  project = var.project_id
+  region  = var.region
 }
 
 resource "google_container_cluster" "primary" {
@@ -16,7 +23,7 @@ resource "google_container_cluster" "primary" {
     ]
     service_account = var.service_account
   }
-  
+
   deletion_protection = false 
 }
 
@@ -37,5 +44,5 @@ variable "cluster_name" {
 }
 
 variable "service_account" {
-  description = "The name of the GKE cluster"
+  description = "The service account for the GKE cluster"
 }
