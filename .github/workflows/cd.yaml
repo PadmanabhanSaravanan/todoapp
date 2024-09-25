@@ -17,28 +17,36 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
+      - name: Set up Google Cloud Credentials
+        run: echo "${{ secrets.GCP_SA_KEY }}" > "${HOME}/gcp-key.json"
+      
+      - name: Authenticate with GCP
+        run: gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
+      
+      - name: Configure gcloud to use project
+        run: gcloud config set project stalwartl-1667731032306
+        
       - name: Terraform Init
         run: terraform init
         env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          GOOGLE_APPLICATION_CREDENTIALS: "${HOME}/gcp-key.json"
 
       - name: Terraform Plan
         run: terraform plan -input=false
         env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          GOOGLE_APPLICATIONS_CREDENTIALS: "${HOME}/gcp-key.json"
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
         env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          GOOGLE_APPLICATIONS_CREDENTIALS: "${HOME}/gcp-key.json"
           
       - name: Fetch GKE Cluster Credentials
         run: |
           gcloud container clusters get-credentials gke-cluster --region us-east1-b --project stalwartl-1667731032306
         env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
-          CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: ${{ secrets.GCP_SA_KEY }}
-
+          GOOGLE_APPLICATION_CREDENTIALS: "${HOME}/gcp-key.json"
+          
   deploy-application:
     runs-on: ubuntu-latest
     needs: setup-gcp
@@ -54,7 +62,7 @@ jobs:
         run: kubectl apply -f deployment.yaml
         env:
           KUBECONFIG: ${{ secrets.KUBECONFIG }}
-
+          
   integration-test:
     runs-on: ubuntu-latest
     needs: deploy-application
@@ -73,4 +81,4 @@ jobs:
       - name: Terraform Destroy
         run: terraform destroy -auto-approve -input=false
         env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          GOOGLE_APPLICATIONS_CREDENTIALS: "${HOME}/gcp-key.json"
