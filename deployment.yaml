@@ -1,31 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-app-deployment
+  name: todoapih2
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
-      app: todo-app
+      app: todo
   template:
     metadata:
       labels:
-        app: todo-app
+        app: todo
     spec:
       containers:
-        - name: todo-app-container
-          image: padmanabhan1/todoapp
-          ports:
-            - containerPort: 8080
+      - name: todoapih2
+        image: vijaynvb/todoapih2:1.0
+        ports:
+        - containerPort: 80
+
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
-  name: todo-app-service
+  name: svctodoh2api
 spec:
-  type: LoadBalancer
-  ports:
-    - port: 80
-      targetPort: 8080
   selector:
-    app: todo-app
+    app: todo
+  ports:
+  - port: 80
+    targetPort: 80
