@@ -128,6 +128,10 @@ jobs:
           asset_name: app-v${{ github.ref_type }}.zip
           asset_content_type: application/zip
 
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Build Docker image
         run: docker build -t vijaynvb/todoapp .
 
