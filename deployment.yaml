@@ -14,9 +14,9 @@ spec:
     spec:
       containers:
       - name: todoapih2
-        image: vijaynvb/todoapih2:1.0
+        image: padmanabhan1/todoapp
         ports:
-        - containerPort: 80
+        - containerPort: 8081 
 
 
 ---
@@ -29,6 +29,6 @@ spec:
   selector:
     app: todo
   ports:
-    - port: 80
-      targetPort: 80
-  type: LoadBalancer  # This line allows the service to have an external IP
+    - port: 80        
+      targetPort: 8081 
+  type: LoadBalancer  
