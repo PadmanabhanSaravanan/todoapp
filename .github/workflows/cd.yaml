@@ -18,7 +18,7 @@ env:
 
 jobs:
   create-cluster:
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest 
     steps:
       - name: Checkout repository
@@ -90,7 +90,7 @@ jobs:
 
       - name: Wait for the service to be ready
         run: |
-          echo "Waiting for 30 seconds..."
+          echo "Waiting for 60 seconds..."
           sleep 60
 
       - name: Extract baseurl from GKE service
