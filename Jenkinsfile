@@ -9,6 +9,18 @@ pipeline {
             }
         }
 
+        stage('Check Maven Installation') {
+            steps {
+                script {
+                    // Check if Maven is installed
+                    def mvnCheck = sh(script: 'mvn -v', returnStatus: true)
+                    if (mvnCheck != 0) {
+                        error("Maven is not installed. Please install Maven on the Jenkins agent.")
+                    }
+                }
+            }
+        }
+
         stage('Build with Maven') {
             steps {
                 // Run Maven build
