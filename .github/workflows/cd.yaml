@@ -10,7 +10,7 @@ on:
 env:
   CREDENTIALS: ${{ secrets.GCP_SA_KEY }} 
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  GKE_CLUSTER: gke-cluster   # cluster name
+  GKE_CLUSTER: gke-cluster-1   # cluster name
   GKE_REGION: us-east1
   GKE_LOCATION: us-east1-b     # cluster location
   SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
@@ -87,6 +87,11 @@ jobs:
 
       - name: Deploy application to GKE
         run: kubectl apply -f deployment.yaml
+
+      - name: Wait for the service to be ready
+        run: |
+          echo "Waiting for 30 seconds..."
+          sleep 30
 
       - name: Extract baseurl from GKE service
         id: extract-url
