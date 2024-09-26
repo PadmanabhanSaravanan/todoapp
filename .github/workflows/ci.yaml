@@ -38,6 +38,7 @@ jobs:
     steps:
       - name: Build with Maven
         run: mvn -B package -Pcoverage
+        
       - name: Generate JaCoCo badge
         id: jacoco
         uses: cicirello/jacoco-badge-generator@v2
@@ -65,6 +66,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
+          cache: 'maven'
       
       - name: Install Maven
         run: |
@@ -86,6 +88,15 @@ jobs:
     runs-on: self-hosted
     needs: sonarqube
     steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn -B package
+        
       - run: mkdir staging && cp target/*.jar staging
       - uses: actions/upload-artifact@v4
         with:
