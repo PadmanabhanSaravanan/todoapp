@@ -90,12 +90,15 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Package
-          path: staging
+          path: staging/*.jar
 
   release:
     runs-on: self-hosted
     needs: artifacts
     steps:
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip  # Install zip utility
+        
       - name: Download web-app content
         uses: actions/download-artifact@v4.1.8
         with:
@@ -107,7 +110,7 @@ jobs:
       - name: Archive site content
         uses: thedoctor0/zip-release@master
         with:
-          filename: site.zip
+          filename: app.zip
 
       - name: Create GitHub release
         id: create-new-release
@@ -115,8 +118,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
+          tag_name: ${{ github.ref_type }}
+          release_name: Release ${{ github.ref_type }}
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
@@ -124,13 +127,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-new-release.outputs.upload_url }}
-          asset_path: ./site.zip
-          asset_name: site-v${{ github.run_number }}.zip
+          asset_path: ./app.zip
+          asset_name: app-v${{ github.ref_type }}.zip
           asset_content_type: application/zip
 
   docker:
     runs-on: self-hosted
-    needs: artifacts
+    needs: sonarqube
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
