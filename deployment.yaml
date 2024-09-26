@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: todoapih2
-        image: padmanabhan1/todoapp
+        image: vijaynvb/todoapih2:1.0
         ports:
         - containerPort: 80
 
