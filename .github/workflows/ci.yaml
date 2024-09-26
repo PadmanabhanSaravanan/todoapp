@@ -93,7 +93,7 @@ jobs:
           path: staging
 
   release:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: artifacts
     steps:
       - name: Checkout repository
