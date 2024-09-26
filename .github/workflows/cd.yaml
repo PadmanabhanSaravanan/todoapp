@@ -115,6 +115,7 @@ jobs:
 
       - name: Delete application from GKE
         run: kubectl delete -f deployment.yaml
+        continue-on-error: true
           
   destroy-cluster:
     runs-on: ubuntu-latest
