@@ -96,9 +96,6 @@ jobs:
     runs-on: self-hosted
     needs: artifacts
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Download web-app content
         uses: actions/download-artifact@v4.1.8
         with:
@@ -130,6 +127,13 @@ jobs:
           asset_path: ./site.zip
           asset_name: site-v${{ github.run_number }}.zip
           asset_content_type: application/zip
+
+  docker:
+    runs-on: self-hosted
+    needs: artifacts
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Build Docker image
         run: docker build -t padmanabhan1/todoapp .
