@@ -1,9 +1,6 @@
 name: Continuous Integration
 
 on:
-  # push:
-  #   branches:
-  #     - main
   workflow_dispatch:
 
 jobs:
@@ -21,14 +18,14 @@ jobs:
       - name: Cache SonarQube packages
         uses: actions/cache@v4.0.2
         with:
-          path: ~/.sonar/cache
+          path: C:\Users\runneradmin\.sonar\cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
       
       - name: Cache Maven packages
         uses: actions/cache@v4.0.2
         with:
-          path: ~/.m2
+          path: C:\Users\runneradmin\.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
@@ -68,13 +65,11 @@ jobs:
       
       - name: Install Maven
         run: |
-          if ! command -v mvn &> /dev/null; then
-            echo "Maven not found. Installing Maven..."
-            sudo apt update
-            sudo apt install -y maven
-          else
-            echo "Maven is already installed."
-          fi
+          if (!(Get-Command mvn -ErrorAction SilentlyContinue)) {
+            choco install maven -y
+          } else {
+            Write-Output "Maven is already installed."
+          }
 
       - name: Build and analyze
         env:
@@ -86,7 +81,7 @@ jobs:
     runs-on: self-hosted
     needs: sonarqube
     steps:
-      - run: mkdir staging && cp target/*.jar staging
+      - run: mkdir staging && copy target\*.jar staging
       - uses: actions/upload-artifact@v4
         with:
           name: Package
