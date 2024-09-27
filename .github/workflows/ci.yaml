@@ -11,6 +11,27 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
+  setup:
+    runs-on: self-hosted
+    needs: checkout
+    steps:
+      - name: Check if Chocolatey is installed
+        run: |
+          if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
+            Write-Output "Chocolatey is not installed. Installing Chocolatey..."
+            Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+          } else {
+            Write-Output "Chocolatey is already installed."
+
+      - name: Check if Maven is installed and install with admin privileges if missing
+        run: |
+          if (!(Get-Command mvn -ErrorAction SilentlyContinue)) {
+            Write-Output "Maven is not installed. Installing Maven with admin privileges..."
+            Start-Process choco -ArgumentList 'install maven -y' -NoNewWindow -Wait -Verb RunAs
+          } else {
+            Write-Output "Maven is already installed."
+        shell: powershell
+
   cache:
     runs-on: self-hosted
     needs: checkout
@@ -33,13 +54,6 @@ jobs:
     runs-on: self-hosted
     needs: cache
     steps:
-      - name: Install Maven
-        run: |
-          if (!(Get-Command mvn -ErrorAction SilentlyContinue)) {
-            choco install maven -y
-          } else {
-            Write-Output "Maven is already installed."
-          }
       - name: Build with Maven
         run: mvn -B package -Pcoverage
       - name: Generate JaCoCo badge
@@ -69,14 +83,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-      
-      - name: Install Maven
-        run: |
-          if (!(Get-Command mvn -ErrorAction SilentlyContinue)) {
-            choco install maven -y
-          } else {
-            Write-Output "Maven is already installed."
-          }
 
       - name: Build and analyze
         env:
