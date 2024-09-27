@@ -13,6 +13,7 @@ jobs:
 
   setup:
     runs-on: self-hosted
+    needs: checkout
     steps:
       - name: Check if Chocolatey is installed
         run: |
