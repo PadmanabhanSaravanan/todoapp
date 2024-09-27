@@ -13,7 +13,6 @@ jobs:
 
   setup:
     runs-on: self-hosted
-    needs: checkout
     steps:
       - name: Check if Chocolatey is installed
         run: |
@@ -28,7 +27,7 @@ jobs:
         run: |
           if (!(Get-Command mvn -ErrorAction SilentlyContinue)) {
             Write-Output "Maven is not installed. Installing Maven with admin privileges..."
-            Start-Process choco -ArgumentList 'install maven -y' -NoNewWindow -Wait -Verb RunAs
+            Start-Process choco -ArgumentList 'install maven -y' -Wait -Verb RunAs
           } else {
             Write-Output "Maven is already installed."
           }
@@ -36,7 +35,7 @@ jobs:
 
   cache:
     runs-on: self-hosted
-    needs: checkout
+    needs: setup
     steps:
       - name: Cache SonarQube packages
         uses: actions/cache@v4.0.2
