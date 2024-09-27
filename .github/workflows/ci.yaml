@@ -33,12 +33,12 @@ jobs:
     runs-on: self-hosted
     needs: cache
     steps:
-      - name: maven setup
+      - name: Setup Java 
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven
+          distribution: 'adopt'
+          java-version: 11
+          cache: 'maven'
     
       - name: Build with Maven
         run: mvn -B package -Pcoverage
@@ -65,12 +65,12 @@ jobs:
     runs-on: self-hosted
     needs: jacoco
     steps:
-      - name: maven setup
+      - name: Setup Java 
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven
+          distribution: 'adopt'
+          java-version: 11
+          cache: 'maven'
 
       - name: Build and analyze
         env:
