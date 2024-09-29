@@ -66,12 +66,12 @@ jobs:
     runs-on: self-hosted
     needs: jacoco
     steps:
-      - name: Setup Java 
-        uses: actions/setup-java@v4
+      - name: Install Java and Maven
+        uses: actions/setup-java@v2
         with:
+          java-version: '15'
           distribution: 'adopt'
-          java-version: 11
-          cache: 'maven'
+          cache: maven
 
       - name: Build and analyze
         env:
