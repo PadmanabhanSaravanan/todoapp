@@ -80,6 +80,15 @@ jobs:
         with:
           maven-version: 3.8.2
 
+      - name: Check SonarQube accessibility
+        run: |
+          if curl -s --head http://localhost:9000 | grep "200 OK" > /dev/null; then 
+            echo "SonarQube is accessible."; 
+          else 
+            echo "SonarQube is not accessible."; 
+            exit 1; 
+          fi         
+
       - name: Download JaCoCo coverage report
         uses: actions/download-artifact@v4.1.8
         with:
