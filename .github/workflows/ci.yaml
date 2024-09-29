@@ -24,7 +24,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      
+          
       - name: Cache Maven packages
         uses: actions/cache@v4.0.2
         with:
@@ -33,9 +33,12 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
   jacoco:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest  # Change to Linux-based runner
     needs: cache
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up Maven
         uses: stCarolas/setup-maven@v5
         with:
@@ -43,6 +46,7 @@ jobs:
         
       - name: Build with Maven
         run: mvn -B package -Pcoverage
+
       - name: Generate JaCoCo badge
         id: jacoco
         uses: cicirello/jacoco-badge-generator@v2
@@ -86,7 +90,8 @@ jobs:
     runs-on: self-hosted
     needs: sonarqube
     steps:
-      - run: mkdir staging && cp target/*.jar staging
+      - name: Copy JAR file to staging
+        run: mkdir staging && cp target/*.jar staging
       - uses: actions/upload-artifact@v4
         with:
           name: Package
