@@ -81,14 +81,14 @@ jobs:
           maven-version: 3.8.2
 
       - name: Check SonarQube accessibility
-        shell: pwsh
+        shell: powershell
         run: |
           $Response = Invoke-WebRequest -Uri http://localhost:9000 -Method Head -ErrorAction Stop
           if ($Response.StatusCode -eq 200) {
-          Write-Output "SonarQube is accessible."
+              Write-Output "SonarQube is accessible."
           } else {
-          Write-Output "SonarQube is not accessible."
-          exit 1
+            Write-Output "SonarQube is not accessible."
+            exit 1
           }
      
 
