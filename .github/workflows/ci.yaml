@@ -68,7 +68,7 @@ jobs:
 
   sonarqube:
     runs-on: self-hosted
-    # needs: jacoco
+    needs: jacoco
     steps:
       - name: Set up JDK 17
         uses: actions/setup-java@v1
@@ -94,11 +94,11 @@ jobs:
       - name: run curl
         run: curl http://localhost:9000/api/system/status
 
-      # - name: Download JaCoCo coverage report
-      #   uses: actions/download-artifact@v4.1.8
-      #   with:
-      #     name: jacoco-report
-      #     path: target/site/jacoco/  # Ensure this matches the upload path
+      - name: Download JaCoCo coverage report
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/  # Ensure this matches the upload path
 
       - name: Build and analyze
         env:
