@@ -1,0 +1,8 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+todoapp,com.company.todoapp.exceptions,TodoNotFoundException,4,0,0,0,2,0,1,0,1,0
+todoapp,com.company.todoapp,TodoappApplication,8,0,0,0,3,0,2,0,2,0
+todoapp,com.company.todoapp.controllers,TodoController,50,121,5,7,12,27,7,8,2,7
+todoapp,com.company.todoapp.models,Todo,140,10,16,0,30,5,20,3,12,3
+todoapp,com.company.todoapp.services.repository,TodoDBService,77,0,4,0,19,0,9,0,7,0
+todoapp,com.company.todoapp.services.repository,TodoStaticService,123,0,10,0,28,0,14,0,9,0
+todoapp,com.company.todoapp.configurations,SecurityConfigurations,49,0,0,0,7,0,2,0,2,0

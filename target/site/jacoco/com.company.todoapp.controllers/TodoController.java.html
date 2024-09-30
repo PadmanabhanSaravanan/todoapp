@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TodoController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">todoapp</a> &gt; <a href="index.source.html" class="el_package">com.company.todoapp.controllers</a> &gt; <span class="el_source">TodoController.java</span></div><h1>TodoController.java</h1><pre class="source lang-java linenums">package com.company.todoapp.controllers;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.company.todoapp.exceptions.TodoNotFoundException;
+import com.company.todoapp.models.Todo;
+import com.company.todoapp.services.ITodoService;
+
+@RestController
+@RequestMapping(&quot;/api/v1/todos&quot;)
+<span class="fc" id="L33">public class TodoController {</span>
+	
+	private static final int Todo = 0;
+	@Autowired
+	ITodoService todoSvc;
+	
+	@GetMapping()
+	public List&lt;Todo&gt; getAllTodos(){
+		 
+<span class="fc" id="L42">		var todos = todoSvc.getAllTodos();</span>
+<span class="pc bpc" id="L43" title="1 of 2 branches missed.">		if(todos.size()==0)</span>
+<span class="nc" id="L44">			throw new TodoNotFoundException(&quot;Todo Not Found&quot;);</span>
+		else {
+<span class="fc bfc" id="L46" title="All 2 branches covered.">			for(Todo todo: todos) {</span>
+<span class="fc" id="L47">				int todoId = todo.getId();</span>
+<span class="fc" id="L48">				Link selfLink = WebMvcLinkBuilder.linkTo(TodoController.class).slash(todoId).withRel(&quot;self&quot;);</span>
+<span class="fc" id="L49">				todo.add(selfLink);</span>
+<span class="fc" id="L50">				Link deleteLink = WebMvcLinkBuilder.linkTo(TodoController.class).slash(todoId).withRel(&quot;Delete&quot;);</span>
+<span class="fc" id="L51">				todo.add(deleteLink);</span>
+<span class="fc" id="L52">				Link updateLink = WebMvcLinkBuilder.linkTo(TodoController.class).slash(todoId).withRel(&quot;update&quot;);</span>
+<span class="fc" id="L53">				todo.add(updateLink);</span>
+<span class="fc" id="L54">			}</span>
+			
+<span class="fc" id="L56">			return todos;</span>
+		}
+	}
+	
+	@GetMapping(&quot;/{id}&quot;)
+	public Todo getByTodoId(@PathVariable int id){
+<span class="fc" id="L62">		var todo = todoSvc.getById(id);</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">		if(todo == null)</span>
+<span class="nc" id="L64">			throw new TodoNotFoundException(&quot;Todo Not Found&quot;);</span>
+		else
+<span class="fc" id="L66">			return todo;</span>
+	}
+	
+	@GetMapping(&quot;/title/{title}&quot;)
+	public List&lt;Todo&gt; getByTodoTitle(@PathVariable String title){
+<span class="fc" id="L71">		var todo = todoSvc.getByTitle(title);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">		if(todo == null)</span>
+<span class="nc" id="L73">			throw new TodoNotFoundException(&quot;Todo Not Found&quot;);</span>
+		else
+<span class="fc" id="L75">			return todo;</span>
+	}
+	
+	@PostMapping()
+	public ResponseEntity&lt;Todo&gt; createTodo(@Valid @RequestBody Todo todo) {	// modelbinding ? spring validation framework 
+		
+<span class="fc" id="L81">		var newTodo = todoSvc.addTodo(todo);</span>
+<span class="fc" id="L82">		return new ResponseEntity&lt;Todo&gt;(newTodo, HttpStatus.CREATED);</span>
+	}
+	
+	@PutMapping(&quot;/{id}&quot;)
+	public ResponseEntity&lt;Todo&gt; updateTodo(@PathVariable int id, @Valid @RequestBody Todo todo) {	// modelbinding ? spring validation framework 
+<span class="fc" id="L87">		var newTodo = todoSvc.updateTodo(id, todo);</span>
+		
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">		if(newTodo != null)</span>
+<span class="fc" id="L90">			return new ResponseEntity&lt;Todo&gt;(newTodo, HttpStatus.OK);</span>
+		else
+			//return (ResponseEntity&lt;com.company.todoapp.models.Todo&gt;) ResponseEntity.notFound();
+<span class="nc" id="L93">			throw new TodoNotFoundException(&quot;Todo Not Found&quot;);</span>
+	}
+	
+	@DeleteMapping(&quot;/{id}&quot;)
+	public ResponseEntity&lt;Todo&gt; deleteTodo(@PathVariable int id) {	// modelbinding ? spring validation framework 
+<span class="fc" id="L98">		var todo = todoSvc.deleteTodo(id);</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">		if(todo != null)</span>
+<span class="fc" id="L100">			return new ResponseEntity&lt;Todo&gt;(todo, HttpStatus.OK);</span>
+		else
+			//return (ResponseEntity&lt;com.company.todoapp.models.Todo&gt;) ResponseEntity.notFound();
+<span class="nc" id="L103">			throw new TodoNotFoundException(&quot;Todo Not Found&quot;);</span>
+	}
+	
+	// MethodArgumentNotValidException
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public Map&lt;String,String&gt; handleValidationExceptions(MethodArgumentNotValidException ex){
+<span class="nc" id="L110">		Map&lt;String,String&gt; errors = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L111">		ex.getBindingResult().getAllErrors().forEach((error) -&gt; {</span>
+<span class="nc" id="L112">			String fieldName = ((FieldError)error).getField();</span>
+<span class="nc" id="L113">			String errorMessage = error.getDefaultMessage();</span>
+<span class="nc" id="L114">			errors.put(fieldName, errorMessage);</span>
+<span class="nc" id="L115">		});</span>
+<span class="nc" id="L116">		return errors;</span>
+	}
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
