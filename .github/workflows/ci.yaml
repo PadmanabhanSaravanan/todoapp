@@ -104,16 +104,10 @@ jobs:
     runs-on: self-hosted
     needs: sonarqube
     steps:
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.8.2
-        
-      - name: Build with Maven
-        run: mvn -B package
-        
       - name: Copy JAR file to staging
-        run: mkdir staging && cp target/*.jar staging
+        run: mkdir staging; cp target/*.jar staging
+        shell: pwsh
+        
       - uses: actions/upload-artifact@v4
         with:
           name: Package
@@ -158,15 +152,7 @@ jobs:
   docker:
     runs-on: self-hosted
     needs: sonarqube
-    steps:
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.8.2
-        
-      - name: Build with Maven
-        run: mvn -B package
-        
+    steps:        
       - name: Build Docker image
         run: docker build -t padmanabhan1/todoapp .
 
