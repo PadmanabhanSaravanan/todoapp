@@ -33,7 +33,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
   jacoco:
-    runs-on: self-hosted  # Change to Linux-based runner
+    runs-on: ubuntu-latest  # Change to Linux-based runner
     needs: cache
     steps:
       - name: Checkout code
