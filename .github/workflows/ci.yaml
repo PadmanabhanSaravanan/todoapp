@@ -68,7 +68,7 @@ jobs:
 
   sonarqube:
     runs-on: self-hosted
-    # needs: jacoco
+    needs: jacoco
     steps:
       - name: Set up JDK 17
         uses: actions/setup-java@v1
