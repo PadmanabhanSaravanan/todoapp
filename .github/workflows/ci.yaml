@@ -105,8 +105,10 @@ jobs:
     needs: sonarqube
     steps:
       - name: Copy JAR file to staging
-        run: mkdir staging; cp target/*.jar staging
-        shell: pwsh
+        run: |
+          mkdir staging
+          Copy-Item target\*.jar staging
+        shell: powershell
         
       - uses: actions/upload-artifact@v4
         with:
